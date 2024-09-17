@@ -40,5 +40,7 @@ public class ObjectPool : MonoBehaviour
     public void ReturnObjectToPool(GameObject obj)
     {
         obj.SetActive(false);
+        obj.transform.position = Vector3.zero; // Resetear la posición inicial
     }
 }
+
