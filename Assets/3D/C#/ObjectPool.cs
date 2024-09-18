@@ -3,25 +3,26 @@ using UnityEngine;
 
 public class ObjectPool : MonoBehaviour
 {
-    public GameObject pokeballPrefab;
-    public int poolSize = 5;
+    public GameObject objectPrefab;
+    public int poolSize = 10;
 
-    public List<GameObject> pool;
+    private List<GameObject> pool = new List<GameObject>();
 
     void Start()
     {
-        pool = new List<GameObject>();
+        // Inicializar el pool con la cantidad deseada de objetos
         for (int i = 0; i < poolSize; i++)
         {
-            GameObject obj = Instantiate(pokeballPrefab);
+            GameObject obj = Instantiate(objectPrefab);
             obj.SetActive(false);
             pool.Add(obj);
         }
     }
 
+    // Obtener un objeto del pool
     public GameObject GetPooledObject()
     {
-        foreach (GameObject obj in pool)
+        foreach (var obj in pool)
         {
             if (!obj.activeInHierarchy)
             {
@@ -30,31 +31,16 @@ public class ObjectPool : MonoBehaviour
             }
         }
 
-        // Si no hay objetos disponibles, creamos uno nuevo
-        GameObject newObj = Instantiate(pokeballPrefab);
-        newObj.SetActive(true);
+        // Si no hay objetos disponibles, instanciar uno nuevo
+        GameObject newObj = Instantiate(objectPrefab);
         pool.Add(newObj);
         return newObj;
     }
 
+    // Retornar el objeto al pool
     public void ReturnObjectToPool(GameObject obj)
     {
-        // Reiniciar la posición y la física
-        obj.transform.position = Vector3.zero;
-        obj.transform.rotation = Quaternion.identity; // Restablecer la rotación
-
-        // Reiniciar la física del objeto si tiene un Rigidbody
-        Rigidbody rb = obj.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-        }
-
-        // Desactivar el objeto
         obj.SetActive(false);
-
-
     }
 }
 
