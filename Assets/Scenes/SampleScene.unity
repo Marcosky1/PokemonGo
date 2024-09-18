@@ -448,9 +448,12 @@ MonoBehaviour:
     type: 3}
   forceMultiplier: 10
   curveTorque: 5
-  curveThreshold: 100
+  curveThreshold: 150
   curveThrowEffect: {fileID: 2997947511210617458, guid: 3c6951630411a014ca0e0fee87cae5a1,
     type: 3}
+  rotationSpeed: 50
+  rotationAcceleration: 150
+  maxRotationSpeed: 500
 --- !u!4 &1315144570
 Transform:
   m_ObjectHideFlags: 0

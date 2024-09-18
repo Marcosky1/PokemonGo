@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PokeballLauncher : MonoBehaviour
 {
-    public GameObject pokeballPrefab;  // Prefab de la pokebola
+    public GameObject pokeballPrefab;
     public float forceMultiplier = 1f;
     public float curveTorque = 5f;
     public float curveThreshold = 100f;
@@ -15,6 +15,10 @@ public class PokeballLauncher : MonoBehaviour
     private Vector2 startTouchPos;
     private Vector2 endTouchPos;
     private Camera mainCamera;
+
+    [SerializeField] private float rotationSpeed = 0f; // Velocidad de rotación
+    [SerializeField] private float rotationAcceleration = 100f; // Aceleración de la rotación
+    [SerializeField] private float maxRotationSpeed = 500f; // Velocidad máxima de rotación
 
     void Start()
     {
@@ -44,26 +48,30 @@ public class PokeballLauncher : MonoBehaviour
 
             if (isDragging)
             {
-                // Mover la pokebola mientras el jugador arrastra
                 Vector3 screenPosition = new Vector3(touchPos.x, touchPos.y, mainCamera.WorldToScreenPoint(currentPokeball.transform.position).z);
                 Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
                 pokeballRigidbody.MovePosition(worldPosition);
+
+                // Incrementar la velocidad de rotación mientras arrastramos
+                rotationSpeed = Mathf.Min(rotationSpeed + rotationAcceleration * Time.deltaTime, maxRotationSpeed);
+
+                // Aplicar rotación a la pokebola en el eje Z
+                pokeballRigidbody.transform.Rotate(Vector3.forward, rotationSpeed * Time.deltaTime);
             }
         }
         else if (Touchscreen.current.primaryTouch.phase.ReadValue() == UnityEngine.InputSystem.TouchPhase.Ended && isDragging)
         {
-            // Soltar la pokebola y lanzarla
             endTouchPos = Touchscreen.current.primaryTouch.position.ReadValue();
             Vector2 swipeDirection = endTouchPos - startTouchPos;
 
             LaunchPokeball(swipeDirection);
             isDragging = false;
+            rotationSpeed = 0f; // Resetear la velocidad de rotación al soltar
         }
     }
 
     void LaunchPokeball(Vector2 direction)
     {
-        // Aplicar fuerza para lanzar la pokebola
         Vector3 force = new Vector3(0f, 1f, 1.0f) * forceMultiplier;
         pokeballRigidbody.AddForce(force, ForceMode.Impulse);
 
@@ -72,7 +80,6 @@ public class PokeballLauncher : MonoBehaviour
         {
             pokeballRigidbody.AddTorque(Vector3.forward * curveTorque, ForceMode.Impulse);
 
-            // Reproducir el efecto de partículas solo si es un tiro con curva
             if (curveThrowEffect != null)
             {
                 curveThrowEffect.gameObject.SetActive(true);
@@ -81,7 +88,6 @@ public class PokeballLauncher : MonoBehaviour
         }
         else
         {
-            // Asegurarse de detener el efecto de partículas si la pokebola no es un tiro con curva
             if (curveThrowEffect != null && curveThrowEffect.isPlaying)
             {
                 curveThrowEffect.Stop();
@@ -90,9 +96,8 @@ public class PokeballLauncher : MonoBehaviour
         }
         pokeballRigidbody.GetComponent<Rigidbody>().useGravity = true;
 
-        // Regresar la pokebola al pool después de 5 segundos
         Destroy(currentPokeball, 5f);
-        Invoke(nameof(SpawnPokeball), 6f); // Dar un pequeño retraso para generar la nueva pokebola
+        Invoke(nameof(SpawnPokeball), 6f);
     }
 
     bool IsCurveThrow(Vector2 start, Vector2 end)
@@ -102,18 +107,13 @@ public class PokeballLauncher : MonoBehaviour
 
     void ReturnPokeballToPool()
     {
-        pokeballRigidbody.velocity = Vector3.zero; // Detener cualquier movimiento de la pokebola
-        pokeballRigidbody.angularVelocity = Vector3.zero; // Detener la rotación
-        pokeballRigidbody.useGravity = false; // Desactivar gravedad
+        pokeballRigidbody.velocity = Vector3.zero;
+        pokeballRigidbody.angularVelocity = Vector3.zero;
+        pokeballRigidbody.useGravity = false;
     }
 
     public void SpawnPokeball()
     {
-        // Obtener una nueva pokebola del pool
         currentPokeball = Instantiate(pokeballPrefab, new Vector3(5.23f, 2.42f, 0.78f), Quaternion.identity);
-
     }
 }
-
-
-
