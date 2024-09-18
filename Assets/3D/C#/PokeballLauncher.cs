@@ -4,13 +4,13 @@ using UnityEngine.InputSystem;
 public class PokeballLauncher : MonoBehaviour
 {
     public ObjectPool objectPool;  
-    public float forceMultiplier = 10f;
+    public float forceMultiplier = 1f;
     public float curveTorque = 5f;
     public float curveThreshold = 100f;
     public ParticleSystem curveThrowEffect;
 
     private GameObject currentPokeball;
-    private Rigidbody pokeballRigidbody;
+    public Rigidbody pokeballRigidbody;
     private bool isDragging = false;
     private Vector2 startTouchPos;
     private Vector2 endTouchPos;
@@ -19,6 +19,7 @@ public class PokeballLauncher : MonoBehaviour
     void Start()
     {
         mainCamera = Camera.main;
+        pokeballRigidbody.useGravity = false;
     }
 
     void Update()
@@ -62,7 +63,7 @@ public class PokeballLauncher : MonoBehaviour
     void LaunchPokeball(Vector2 direction)
     {
         // Aplicar fuerza para lanzar la pokebola
-        Vector3 force = new Vector3(direction.x, direction.y, 1.0f) * forceMultiplier;
+        Vector3 force = new Vector3(0f, 1f, 1.0f) * forceMultiplier;
         pokeballRigidbody.AddForce(force, ForceMode.Impulse);
 
         // Si es un tiro con curva
@@ -74,7 +75,7 @@ public class PokeballLauncher : MonoBehaviour
                 curveThrowEffect.Play();
             }
         }
-
+        pokeballRigidbody.useGravity = true;
         // Regresar la pokebola al pool después de 5 segundos
         Invoke(nameof(ReturnPokeballToPool), 5f);
     }
@@ -88,7 +89,8 @@ public class PokeballLauncher : MonoBehaviour
     {
         pokeballRigidbody.velocity = Vector3.zero; // Detener cualquier movimiento de la pokebola
         pokeballRigidbody.angularVelocity = Vector3.zero; // Detener la rotación
-        objectPool.ReturnObjectToPool(currentPokeball); // Regresar al pool
+        objectPool.ReturnObjectToPool(currentPokeball); // Regresar al poolw
+        print("qwedwda");
     }
 
     public void SpawnPokeball()
@@ -96,7 +98,7 @@ public class PokeballLauncher : MonoBehaviour
         // Obtener una nueva pokebola del pool
         currentPokeball = objectPool.GetPooledObject();
         pokeballRigidbody = currentPokeball.GetComponent<Rigidbody>();
-        currentPokeball.transform.position = Vector3.zero;  // Posición inicial
+        transform.position = new Vector3(5.230001f, 2.42f, 0.7799997f);
     }
 }
 

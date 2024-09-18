@@ -6,7 +6,7 @@ public class ObjectPool : MonoBehaviour
     public GameObject pokeballPrefab;
     public int poolSize = 5;
 
-    private List<GameObject> pool;
+    public List<GameObject> pool;
 
     void Start()
     {
@@ -39,8 +39,22 @@ public class ObjectPool : MonoBehaviour
 
     public void ReturnObjectToPool(GameObject obj)
     {
+        // Reiniciar la posición y la física
+        obj.transform.position = Vector3.zero;
+        obj.transform.rotation = Quaternion.identity; // Restablecer la rotación
+
+        // Reiniciar la física del objeto si tiene un Rigidbody
+        Rigidbody rb = obj.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        // Desactivar el objeto
         obj.SetActive(false);
-        obj.transform.position = Vector3.zero; // Resetear la posición inicial
+
+
     }
 }
 
