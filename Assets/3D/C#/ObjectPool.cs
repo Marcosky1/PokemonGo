@@ -3,26 +3,25 @@ using UnityEngine;
 
 public class ObjectPool : MonoBehaviour
 {
-    public GameObject objectPrefab;
-    public int poolSize = 10;
+    public GameObject pokeballPrefab;
+    public int poolSize = 5;
 
-    private List<GameObject> pool = new List<GameObject>();
+    private List<GameObject> pool;
 
     void Start()
     {
-        // Inicializar el pool con la cantidad deseada de objetos
+        pool = new List<GameObject>();
         for (int i = 0; i < poolSize; i++)
         {
-            GameObject obj = Instantiate(objectPrefab);
+            GameObject obj = Instantiate(pokeballPrefab);   
             obj.SetActive(false);
             pool.Add(obj);
         }
     }
 
-    // Obtener un objeto del pool
     public GameObject GetPooledObject()
     {
-        foreach (var obj in pool)
+        foreach (GameObject obj in pool)
         {
             if (!obj.activeInHierarchy)
             {
@@ -31,16 +30,17 @@ public class ObjectPool : MonoBehaviour
             }
         }
 
-        // Si no hay objetos disponibles, instanciar uno nuevo
-        GameObject newObj = Instantiate(objectPrefab);
+        // Si no hay objetos disponibles, creamos uno nuevo
+        GameObject newObj = Instantiate(pokeballPrefab);
+        newObj.SetActive(true);
         pool.Add(newObj);
         return newObj;
     }
 
-    // Retornar el objeto al pool
     public void ReturnObjectToPool(GameObject obj)
     {
         obj.SetActive(false);
+        obj.transform.position = Vector3.zero; // Resetear la posición inicial
     }
 }
 
